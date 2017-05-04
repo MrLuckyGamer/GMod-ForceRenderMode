@@ -8,16 +8,16 @@ This simple script will help prevent the 'poping out' effect and fixes problem t
 Currently this code will act as temporary fixes, if this issue has been solved from the Garry's Mod issue tracker, this code might be removed or will be left as a reference.
 
 ## Install
-### Shipping from your Map Addon
+### Shipping to your Map Addon
 Create a folder inside your map addon: `lua/autorun/server` Place "sv_force_rendermode.lua" within the `/server` directory.
 
 ### Server Side (Dedicated/Listen)
 Place the script under your `garrysmod/lua/autorun/server`.
 
-### (Optional) Disable Forcing Rendermode from map that you made
-- Create an 'lua_run' entity. 
-- Set a code value to `if RENDER_DISABLE_FORCE_RENDERMODE then RENDER_DISABLE_FORCE_RENDERMODE = true end` (or simply) `RENDER_DISABLE_FORCE_RENDERMODE = true`
-- make sure this lua_run must be executed on every map spawn, which can be triggered from logic_auto or logic_relay with OnMapSpawn/OnSpawn output.
+### (Optional) Disable Forcing Rendermode from your map
+- Create 'lua_run' entity. 
+- Set 'Code' keyvalue to `if RENDER_DISABLE_FORCE_RENDERMODE then RENDER_DISABLE_FORCE_RENDERMODE = true end` (or simply) `RENDER_DISABLE_FORCE_RENDERMODE = true`
+- Make sure that this lua_run must be executed on every map spawn, which can be triggered from logic_auto or logic_relay with OnMapSpawn/OnSpawn output.
 
 ## ConVars
 `render_force_map_rendermode 1/0` 
@@ -32,7 +32,7 @@ Nore: **Using improper render mode may cause improper rendering!!** | See: http:
 
 `render_force_verbosemsg 1/0`
 
-Verbosely print when applying the Render Modes to each entities.
+print Verbosely to console when applying the Render Modes.
 
 ## Issues
 Having issues? Not working? or conflicted with your addon? Post a specific problem on "Issue tracker" above.
