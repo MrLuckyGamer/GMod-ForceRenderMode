@@ -53,9 +53,9 @@ local Ents = {
 RENDER_DISABLE_FORCE_RENDERMODE = false
 
 local function UpdateRenderMode(bIsCleanUp)
-	if (GetConVar("render_force_map_rendermode"):GetBool() or RENDER_DISABLE_FORCE_RENDERMODE) then
-	
-	local CUR_RENDERMODE = GetConVar("render_force_mode_type"):GetInt()
+	if GetConVar("render_force_map_rendermode"):GetBool() then
+		
+		local CUR_RENDERMODE = GetConVar("render_force_mode_type"):GetInt()
 	
 		if CUR_RENDERMODE < 0 or CUR_RENDERMODE > 10 then
 			pVerbose("[ForceRenderMode] WARNING: Invalid RENDERMODE enum type set! ("..tostring(CUR_RENDERMODE)..") -- Reverting to RENDERMODE_TRANSALPHA(4) instead...")
@@ -87,11 +87,15 @@ local function UpdateRenderMode(bIsCleanUp)
 		if !bIsCleanUp then
 			--safe timing call.
 			timer.Simple(2.5, function()
+				if RENDER_DISABLE_FORCE_RENDERMODE == true then return end
+					
 				print("[ForceRenderMode] Initializing entity Render Mode for better Min/Max Fade distance optimisation...")
 				ForceRenderMode()
 			end)
 		else
 			timer.Simple(1, function()
+				if RENDER_DISABLE_FORCE_RENDERMODE == true then return end
+					
 				print("[ForceRenderMode] Initializing PostCleanup entity Render Mode for better Min/Max Fade distance optimisation...")
 				ForceRenderMode()
 			end)
