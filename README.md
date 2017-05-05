@@ -16,7 +16,7 @@ Place the script under your `garrysmod/lua/autorun/server`.
 
 ### (Optional) Disable Forcing Rendermode from your map
 - Create 'lua_run' entity. 
-- Set 'Code' keyvalue to `if RENDER_DISABLE_FORCE_RENDERMODE then RENDER_DISABLE_FORCE_RENDERMODE = true end` (or simply) `RENDER_DISABLE_FORCE_RENDERMODE = true`
+- Set 'Code' keyvalue to `if RENDER_DISABLE_FORCE_RENDERMODE == nil then RENDER_DISABLE_FORCE_RENDERMODE = true end` (or simply) `RENDER_DISABLE_FORCE_RENDERMODE = true`
 - Make sure that this lua_run must be executed on every map spawn, which can be triggered from logic_auto or logic_relay with OnMapSpawn/OnSpawn output.
 
 ## ConVars
