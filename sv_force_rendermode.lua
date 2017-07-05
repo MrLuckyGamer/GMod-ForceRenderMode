@@ -2,6 +2,8 @@
 	Realm: 
 	Server
 	
+	Version: Beta 1.1
+	
 	Purpose: 
 	Fixes default map entity min/max fade distance (BaseFadeProp) in Garry's Mod, which caused from RENDERMODE_NORMAL not fading properly from a distance.
 	This script will help prevent the 'poping out' effect from a distance which it will sets to RENDERMODE_TRANSALPHA on every map starts by default (Configurable via ConVar below)
@@ -9,13 +11,14 @@
 	Triggers:
 	InitPostEntity
 	PostCleanupMap
+	(Todo: Initialize)
 	lua_run Map Entity. (Use: RENDER_DISABLE_FORCE_RENDERMODE)
 	
 	Related Garry's mod Issue:
 	https://github.com/Facepunch/garrysmod-issues/issues/2926
 ]]--
 
--- ConVar
+-- ConVar -- Use custom CFG to get this loaded properly. // To Do: Make it more organised.
 if !ConVarExists("render_force_map_rendermode") then
 	CreateConVar("render_force_map_rendermode", "1", {FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED}, "Toggle default BaseFadeProp behaviour to force set the Entity\'s RENDERMODE from RENDERMODE_NORMAL to RENDERMODE_TRANSALPHA Rendering mode.")
 	CreateConVar("render_force_mode_type", "4", {FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED}, "Set Default RenderMode type. (default is 4 = RENDERMODE_TRANSALPHA)\n\n!! Using improper render mode may cause improper rendering!\nSee: http://wiki.garrysmod.com/page/Enums/RENDERMODE")
@@ -35,18 +38,18 @@ local Ents = {
 	["prop_physics"] 				= true,
 	["prop_physics_multiplayer"]	= true,
 	["prop_physics_override"] 		= true,
-	["prop_dynamic"] 			= true,
-	["prop_dynamic_override"]	= true,
-	["prop_ragdoll"] 			= true,
+	["prop_dynamic"] 				= true,
+	["prop_dynamic_override"]		= true,
+	["prop_ragdoll"] 				= true,
 	-- map specific entity
-	["func_lod"] 		= true,
-	["info_overlay"] 	= true,	-- I don't think info_overlay can be set here...
-	-- npc
-	["npc_barnacle"] 	= true,
-	["npc_antliongrub"] = true,
+	["func_lod"] 					= true,
+	["info_overlay"] 				= true,	-- I don't think info_overlay can be set here...
+	-- npc			
+	["npc_barnacle"] 				= true,
+	["npc_antliongrub"] 			= true,
 	-- Crates/Supply Crate Cache
-	["item_item_crate"] = true,
-	["item_ammo_crate"] = true
+	["item_item_crate"] 			= true,
+	["item_ammo_crate"] 			= true
 }
 
 -- Custom Config. Called from lua_run map enttiy. Use logic_auto or logic_case with OnMapSpawn/OnSpawn output with delay 0.00 (Immediately).
@@ -64,22 +67,42 @@ local function UpdateRenderMode(bIsCleanUp)
 		
 		local function ForceRenderMode()
 			for _,ent in pairs(ents.GetAll()) do
-				-- Get All Entities matches from table.
-				if IsValid(ent) && (Ents[ent:GetClass()] && ent:GetRenderMode() == RENDERMODE_NORMAL) && ent:CreatedByMap() then
-					pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
-					ent:SetRenderMode(CUR_RENDERMODE)
-				end
+			
+				-- todo: ConVar, and better KeyValues detection.
+				local Prop = ent:GetKeyValues()
+
+				--[[
+
+				fademaxdist     =       0
+				fademindist     =       -1
+
+				// to do: it seems to be pretty rare used on any custom maps. Confirm?
+				fadescale       =       1
+				local FadeScale = tonumber(Prop["fadescale"])
 				
-				-- Get All entities if they are Weapons -- MAKE SURE THOSE ENTITY ARE CREATED FROM MAP!
-				if IsValid(ent) && (ent:IsWeapon() && ent:CreatedByMap()) && ent:GetRenderMode() == RENDERMODE_NORMAL then
-					pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on weapon entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
-					ent:SetRenderMode(CUR_RENDERMODE)
-				end
+				]]--
+
+				local Min = tonumber(Prop["fademindist"])
+				local Max = tonumber(Prop["fademaxdist"])
 				
-				-- Get All entities if they are item_* entities.
-				if IsValid(ent) && string.find(ent:GetClass(),"item_") && (ent:CreatedByMap() && ent:GetRenderMode() == RENDERMODE_NORMAL) then
-					pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on item entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
-					ent:SetRenderMode(CUR_RENDERMODE)
+				if (Min > -1) or (Max > 0) then
+					-- Get All Entities matches from table.
+					if IsValid(ent) && (Ents[ent:GetClass()] && ent:GetRenderMode() == RENDERMODE_NORMAL) && ent:CreatedByMap() then
+						pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
+						ent:SetRenderMode(CUR_RENDERMODE)
+					end
+					
+					-- Get All entities if they are Weapons -- MAKE SURE THOSE ENTITY ARE CREATED FROM MAP!
+					if IsValid(ent) && (ent:IsWeapon() && ent:CreatedByMap()) && ent:GetRenderMode() == RENDERMODE_NORMAL then
+						pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on weapon entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
+						ent:SetRenderMode(CUR_RENDERMODE)
+					end
+					
+					-- Get All entities if they are item_* entities.
+					if IsValid(ent) && string.find(ent:GetClass(),"item_") && (ent:CreatedByMap() && ent:GetRenderMode() == RENDERMODE_NORMAL) then
+						pVerbose("[ForceRenderMode] Applying RENDERMODE("..CUR_RENDERMODE..") on item entity: "..ent:GetClass().." [ID:"..ent:EntIndex().."/MAPID: "..ent:MapCreationID().."]")
+						ent:SetRenderMode(CUR_RENDERMODE)
+					end
 				end
 			end
 		end
@@ -111,3 +134,12 @@ end)
 hook.Add("PostCleanupMap", "WOLVIN_CLN.ApplyRenderMode_Fix", function()
 	UpdateRenderMode(true)
 end)
+
+--[[
+// To do
+hook.Add("Initialize", "WOLVIN_INITIALIZE.ApplyRenderMode_Fix", function()
+	timer.Simple(5, function()
+		UpdateRenderMode(true)
+	end)
+end)
+]]
